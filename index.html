@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Devicon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['DM Serif Display', 'Georgia', 'serif'],
+            sans: ['DM Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ─── Theme transition ─── */
+    html { transition: background-color 0.4s ease, color 0.4s ease; }
+
+    /* ─── Devicon monochrome filter ─── */
+    .devicon-gray { filter: grayscale(1) brightness(0.6); transition: filter 0.25s; }
+    .dark .devicon-gray { filter: grayscale(1) brightness(1.6); }
+    .skill-icon-wrap:hover .devicon-gray { filter: none; }
+
+    /* ─── Scroll reveal ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+                  transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── Theme toggle button ─── */
+    #theme-toggle {
+      cursor: pointer;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1px solid #d4d4d4;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+      font-size: 1.1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .dark #theme-toggle { border-color: #333; }
+    #theme-toggle:hover { border-color: #111; }
+    .dark #theme-toggle:hover { border-color: #e5e5e5; }
+    #theme-toggle .icon-sun,
+    #theme-toggle .icon-moon {
+      position: absolute;
+      transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.3s;
+    }
+    .light #theme-toggle .icon-moon { transform: translateY(30px); opacity: 0; }
+    .dark  #theme-toggle .icon-sun  { transform: translateY(-30px); opacity: 0; }
+
+    /* ─── Mobile menu ─── */
+    #mobile-menu.show { transform: translateX(0); }
+
+    /* ─── Mobile theme toggle icons ─── */
+    .light .icon-moon-mobile { display: none; }
+    .dark  .icon-sun-mobile  { display: none; }
+
+    /* ─── Project card hover arrow ─── */
+    .project-card:hover .arrow-circle {
+      background: #111; color: #fff; border-color: #111;
+    }
+    .dark .project-card:hover .arrow-circle {
+      background: #fff; color: #111; border-color: #fff;
+    }
+
+    /* ─── Nav scroll background ─── */
+    #navbar {
+      transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    #navbar.scrolled {
+      background: rgba(255,255,255,0.82); border-bottom: 1px solid #e5e5e5;
+    }
+    .dark #navbar.scrolled {
+      background: rgba(10,10,10,0.82); border-bottom: 1px solid #1f1f1f;
+    }
+    @supports (backdrop-filter: blur(12px)) {
+      #navbar.scrolled { backdrop-filter: blur(12px); }
+    }
+  </style>
+</head>
+
+<body class="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 font-sans antialiased transition-colors duration-300">
+
+  <!-- ═══ Navigation ═══ -->
+  <nav id="navbar" class="fixed top-0 inset-x-0 z-50 border-b border-transparent">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="font-serif text-xl tracking-tight text-black dark:text-white">Portfolio</a>
+
+      <!-- Desktop links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#skills"   class="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">Skills</a>
+        <a href="#projects" class="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">Projects</a>
+        <a href="#about"    class="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">About</a>
+        <a href="#contact"  class="text-sm font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">Contact</a>
+        <button id="theme-toggle" aria-label="Toggle theme">
+          <span class="icon-sun">&#x2600;</span>
+          <span class="icon-moon">&#x1f319;</span>
+        </button>
+      </div>
+
+      <!-- Mobile: theme + hamburger -->
+      <div class="flex items-center gap-3 md:hidden">
+        <button id="theme-toggle-mobile" aria-label="Toggle theme" class="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700 flex items-center justify-center bg-transparent">
+          <span class="icon-sun-mobile text-sm">&#x2600;</span>
+          <span class="icon-moon-mobile text-sm hidden">&#x1f319;</span>
+        </button>
+        <button id="menu-toggle" aria-label="Toggle menu" class="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700 flex items-center justify-center bg-transparent">
+          <svg id="menu-icon-open" class="w-4 h-4 text-zinc-600 dark:text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="menu-icon-close" class="w-4 h-4 text-zinc-600 dark:text-zinc-400 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div id="mobile-menu" class="md:hidden fixed inset-x-0 top-16 bottom-0 bg-white dark:bg-zinc-950 transform translate-x-full transition-transform duration-300 ease-in-out">
+      <div class="flex flex-col items-center gap-8 pt-16">
+        <a href="#skills"   class="menu-link text-lg font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">Skills</a>
+        <a href="#projects" class="menu-link text-lg font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">Projects</a>
+        <a href="#about"    class="menu-link text-lg font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">About</a>
+        <a href="#contact"  class="menu-link text-lg font-medium text-zinc-500 hover:text-black dark:hover:text-white transition-colors uppercase tracking-widest">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ 技能 ═══ -->
+  <section id="skills" class="py-28 border-t border-zinc-100 dark:border-zinc-900">
+    <div class="max-w-5xl mx-auto px-6">
+
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500 mb-4">Skills</p>
+      <h2 class="font-serif text-4xl sm:text-5xl text-black dark:text-white tracking-[-0.03em] mb-4">技术能力</h2>
+      <div class="w-12 h-0.5 bg-black dark:bg-white mb-16"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Frontend -->
+        <div class="reveal group p-8 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                    hover:border-zinc-300 dark:hover:border-zinc-600
+                    hover:shadow-lg hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50
+                    transition-all duration-300 bg-white dark:bg-zinc-950">
+          <h3 class="font-serif text-xl text-black dark:text-white mb-6">前端开发</h3>
+          <div class="space-y-4">
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-react-original text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">React</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-javascript-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">JavaScript</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-css3-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">CSS</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-html5-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">HTML</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-vitest-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">Vitest</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backend -->
+        <div class="reveal group p-8 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                    hover:border-zinc-300 dark:hover:border-zinc-600
+                    hover:shadow-lg hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50
+                    transition-all duration-300 bg-white dark:bg-zinc-950">
+          <h3 class="font-serif text-xl text-black dark:text-white mb-6">后端开发</h3>
+          <div class="space-y-4">
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-nodejs-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">Node.js</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-express-original text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">Express</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-prisma-original text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">Prisma</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-postgresql-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">PostgreSQL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tools -->
+        <div class="reveal group p-8 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                    hover:border-zinc-300 dark:hover:border-zinc-600
+                    hover:shadow-lg hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50
+                    transition-all duration-300 bg-white dark:bg-zinc-950">
+          <h3 class="font-serif text-xl text-black dark:text-white mb-6">开发工具</h3>
+          <div class="space-y-4">
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-git-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">Git</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-vscode-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">VS Code</span>
+            </div>
+            <div class="skill-icon-wrap flex items-center gap-3">
+              <i class="devicon-linux-plain text-2xl devicon-gray"></i>
+              <span class="font-mono text-sm text-zinc-600 dark:text-zinc-400">Linux</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 项目 ═══ -->
+  <section id="projects" class="py-28 border-t border-zinc-100 dark:border-zinc-900">
+    <div class="max-w-5xl mx-auto px-6">
+
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500 mb-4">Projects</p>
+      <h2 class="font-serif text-4xl sm:text-5xl text-black dark:text-white tracking-[-0.03em] mb-4">精选项目</h2>
+      <div class="w-12 h-0.5 bg-black dark:bg-white mb-16"></div>
+
+      <div class="space-y-6">
+
+        <!-- Project 01 -->
+        <article class="reveal project-card grid grid-cols-[60px_1fr_auto] gap-6 sm:gap-10 items-start
+                        p-6 sm:p-8 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                        hover:border-zinc-300 dark:hover:border-zinc-600
+                        transition-all duration-300 bg-white dark:bg-zinc-950
+                        hover:shadow-md hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50">
+          <span class="font-serif text-4xl sm:text-5xl text-zinc-200 dark:text-zinc-800 leading-none">01</span>
+          <div>
+            <h3 class="font-serif text-xl sm:text-2xl text-black dark:text-white tracking-[-0.02em] mb-2">
+              实时数据处理系统
+            </h3>
+            <p class="text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4 max-w-2xl">
+              高性能事件驱动数据处理平台，支持每秒处理百万级事件。实现了低延迟数据流水线，并提供直观的可视化监控面板。
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">React</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Node.js</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">PostgreSQL</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Express</span>
+            </div>
+          </div>
+          <a href="#" class="arrow-circle w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700
+                           flex items-center justify-center text-zinc-400 dark:text-zinc-500
+                           transition-all duration-300 text-lg no-underline self-center">&#8599;</a>
+        </article>
+
+        <!-- Project 02 -->
+        <article class="reveal project-card grid grid-cols-[60px_1fr_auto] gap-6 sm:gap-10 items-start
+                        p-6 sm:p-8 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                        hover:border-zinc-300 dark:hover:border-zinc-600
+                        transition-all duration-300 bg-white dark:bg-zinc-950
+                        hover:shadow-md hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50">
+          <span class="font-serif text-4xl sm:text-5xl text-zinc-200 dark:text-zinc-800 leading-none">02</span>
+          <div>
+            <h3 class="font-serif text-xl sm:text-2xl text-black dark:text-white tracking-[-0.02em] mb-2">
+              全栈电商平台
+            </h3>
+            <p class="text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4 max-w-2xl">
+              完整的电商解决方案，包含商品管理、购物车、支付集成和订单追踪。前后端分离架构，支持响应式布局与暗色模式。
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">React</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">JavaScript</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Node.js</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Prisma</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">PostgreSQL</span>
+            </div>
+          </div>
+          <a href="#" class="arrow-circle w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700
+                           flex items-center justify-center text-zinc-400 dark:text-zinc-500
+                           transition-all duration-300 text-lg no-underline self-center">&#8599;</a>
+        </article>
+
+        <!-- Project 03 -->
+        <article class="reveal project-card grid grid-cols-[60px_1fr_auto] gap-6 sm:gap-10 items-start
+                        p-6 sm:p-8 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                        hover:border-zinc-300 dark:hover:border-zinc-600
+                        transition-all duration-300 bg-white dark:bg-zinc-950
+                        hover:shadow-md hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50">
+          <span class="font-serif text-4xl sm:text-5xl text-zinc-200 dark:text-zinc-800 leading-none">03</span>
+          <div>
+            <h3 class="font-serif text-xl sm:text-2xl text-black dark:text-white tracking-[-0.02em] mb-2">
+              前端构建 CLI 工具
+            </h3>
+            <p class="text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4 max-w-2xl">
+              开源命令行工具，自动化前端项目的构建、测试与部署流程。支持自定义插件，发布在 npm 上，累计 500+ 周下载量。
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">JavaScript</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Node.js</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Vitest</span>
+              <span class="font-mono text-xs px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">Git</span>
+            </div>
+          </div>
+          <a href="#" class="arrow-circle w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700
+                           flex items-center justify-center text-zinc-400 dark:text-zinc-500
+                           transition-all duration-300 text-lg no-underline self-center">&#8599;</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 自我介绍 ═══ -->
+  <section id="about" class="py-28 border-t border-zinc-100 dark:border-zinc-900">
+    <div class="max-w-5xl mx-auto px-6">
+
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500 mb-4">About</p>
+      <h2 class="font-serif text-4xl sm:text-5xl text-black dark:text-white tracking-[-0.03em] mb-4">关于我</h2>
+      <div class="w-12 h-0.5 bg-black dark:bg-white mb-16"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-16 items-center">
+
+        <!-- Text -->
+        <div>
+          <h3 class="font-serif text-4xl sm:text-5xl text-black dark:text-white tracking-[-0.03em] mb-3">
+            周懿
+          </h3>
+          <p class="text-lg text-zinc-500 dark:text-zinc-400 font-light tracking-wide mb-6">
+            全栈工程师 <span class="text-black dark:text-white font-medium">/</span> 开源爱好者
+          </p>
+          <p class="text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-lg text-base">
+            热爱构建优雅的软件解决方案，专注于前后端全栈开发。
+            拥有多年经验，擅长将复杂问题转化为简洁、可维护的代码。
+            相信技术应该为人服务，代码应该被阅读而非仅仅被执行。
+          </p>
+        </div>
+
+        <!-- Photo placeholder -->
+        <div class="flex justify-center lg:justify-end">
+          <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700
+                      bg-zinc-50 dark:bg-zinc-900 flex flex-col items-center justify-center gap-3
+                      hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors cursor-pointer
+                      text-zinc-300 dark:text-zinc-600">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+            </svg>
+            <span class="font-mono text-xs">添加照片</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 联系方式 ═══ -->
+  <section id="contact" class="py-28 border-t border-zinc-100 dark:border-zinc-900">
+    <div class="max-w-5xl mx-auto px-6">
+
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500 mb-4">Contact</p>
+      <h2 class="font-serif text-4xl sm:text-5xl text-black dark:text-white tracking-[-0.03em] mb-4">联系方式</h2>
+      <div class="w-12 h-0.5 bg-black dark:bg-white mb-16"></div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        <!-- Email -->
+        <a href="mailto:yourname@example.com"
+           class="reveal group flex items-center gap-5 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                  hover:border-zinc-300 dark:hover:border-zinc-600
+                  hover:shadow-md hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50
+                  transition-all duration-300 bg-white dark:bg-zinc-950 no-underline">
+          <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center
+                      group-hover:bg-black dark:group-hover:bg-white transition-colors duration-300">
+            <svg class="w-5 h-5 text-zinc-500 dark:text-zinc-400 group-hover:text-white dark:group-hover:text-black transition-colors"
+                 fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-zinc-400 dark:text-zinc-500 mb-0.5">Email</p>
+            <p class="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-black dark:group-hover:text-white transition-colors">
+              yourname@example.com
+            </p>
+          </div>
+        </a>
+
+        <!-- GitHub -->
+        <a href="https://github.com" target="_blank"
+           class="reveal group flex items-center gap-5 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                  hover:border-zinc-300 dark:hover:border-zinc-600
+                  hover:shadow-md hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50
+                  transition-all duration-300 bg-white dark:bg-zinc-950 no-underline">
+          <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center
+                      group-hover:bg-black dark:group-hover:bg-white transition-colors duration-300">
+            <svg class="w-5 h-5 text-zinc-500 dark:text-zinc-400 group-hover:text-white dark:group-hover:text-black transition-colors"
+                 fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-zinc-400 dark:text-zinc-500 mb-0.5">GitHub</p>
+            <p class="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-black dark:group-hover:text-white transition-colors">
+              github.com/yourname
+            </p>
+          </div>
+        </a>
+
+        <!-- WeChat -->
+        <div class="reveal group flex items-center gap-5 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                    hover:border-zinc-300 dark:hover:border-zinc-600
+                    hover:shadow-md hover:shadow-zinc-100 dark:hover:shadow-zinc-900/50
+                    transition-all duration-300 bg-white dark:bg-zinc-950">
+          <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center
+                      group-hover:bg-black dark:group-hover:bg-white transition-colors duration-300">
+            <svg class="w-5 h-5 text-zinc-500 dark:text-zinc-400 group-hover:text-white dark:group-hover:text-black transition-colors"
+                 fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-zinc-400 dark:text-zinc-500 mb-0.5">微信</p>
+            <p class="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-black dark:group-hover:text-white transition-colors">
+              your_wechat_id
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Footer ═══ -->
+  <footer class="border-t border-zinc-100 dark:border-zinc-900 py-10">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <p class="text-sm text-zinc-400 dark:text-zinc-500 font-mono">
+        &copy; 2026 <span class="text-black dark:text-white">Your Name</span>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ═══ Scripts ═══ -->
+  <script>
+    // ── Theme toggle ──
+    const html = document.documentElement;
+    const toggle = document.getElementById('theme-toggle');
+
+    // Load saved theme
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+      html.classList.remove('light');
+      html.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // ── Mobile theme toggle (sync with main toggle) ──
+    const mobileToggle = document.getElementById('theme-toggle-mobile');
+    mobileToggle.addEventListener('click', () => toggle.click());
+
+    // ── Mobile menu toggle ──
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuOpenIcon  = document.getElementById('menu-icon-open');
+    const menuCloseIcon = document.getElementById('menu-icon-close');
+    const menuLinks = document.querySelectorAll('.menu-link');
+
+    function openMenu() {
+      mobileMenu.classList.add('show');
+      menuOpenIcon.classList.add('hidden');
+      menuCloseIcon.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      mobileMenu.classList.remove('show');
+      menuOpenIcon.classList.remove('hidden');
+      menuCloseIcon.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.contains('show') ? closeMenu() : openMenu();
+    });
+
+    menuLinks.forEach(link => link.addEventListener('click', closeMenu));
+
+    // ── Scroll reveal ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── Nav scroll effect ──
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 8);
+    });
+  </script>
+</body>
+</html>
